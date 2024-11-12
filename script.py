@@ -1,7 +1,55 @@
 import socket
 import threading
+import re
 
-ip = input("IP address to scan: ")
+# Validate IP.
+def is_valid_ip(ip):
+    regex = r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" # Regex for validating an IPv4 address.
+    return re.match(regex, ip)is not None
+
+# Validate port range.
+def is_valid_port(port):
+    return 1 <= port <= 65535
+
+# Handle & validate IP address input.
+def get_ip():
+    while True:
+        ip = input("IP address to scan: ").strip()
+        if is_valid_ip(ip):
+            return ip
+        else:
+            print("Invalid IP address.")
+
+# Handle  & validate port input.
+def get_port_range():
+    while True:
+        try:
+            start_port_input = input("Start port (default 1): ").strip()
+            end_port_input = input("End port (default: 65535): ").strip()
+
+            # If input is empty, add feault values.
+            if not start_port_input:
+                start_port = 1
+            else:
+                start_port = int(start_port_input)
+
+            if not end_port_input:
+                end_port = 65535
+            else:
+                end_port = int(end_port_input) 
+
+            # Validate port range.
+            if is_valid_port(start_port) and is_valid_port(end_port) and start_port <= end_port:
+                return start_port, end_port
+            else:
+                print("Invalid port range. Port range must be 1 to 65535.")
+        except ValueError:
+            print("Invalid input. Please enter valid numeric values for ports.")
+
+# User input with validation.
+ip = get_ip()
+start_port, end_port = get_port_range()
+
 timeout = 3
 max_retries = 3
 
@@ -18,21 +66,22 @@ def scan_port(port):
             # 0 = open port
             if result == 0:
                 print(f"Open port: {port}")
-                sock.close()
             else:
                 print(f"Closed port: {port}")
+            sock.close()
             break # Break if the port is successfully scanned.
         except sock.error:
             retries += 1
             if retries == max_retries:
                 print(f"Failed to scan the port: {port}")
-                break # Break after max entries.
+            sock.close()
+            break # Break after max entries.
 
 # This list will store references to all the created thread objects.
 threads = []
 
 # Loop thorugh the 65535 exsisting ports.
-for port in range(1, 65536):
+for port in range(start_port, end_port + 1):
     # For every port, a thread is created, excecuting the scan_port function in the port.
     thread = threading.Thread(target=scan_port, args=(port,))
 
