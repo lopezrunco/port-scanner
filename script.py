@@ -2,19 +2,31 @@ import socket
 import threading
 
 ip = input("IP address to scan: ")
+timeout = 3
+max_retries = 3
 
 def scan_port(port):
-    # Create a socket (socket.AF_INET to use IPv4.), (socket.SOCK_STREAM to use TCP protocol)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(5)
-    result = sock.connect_ex((ip, port))
+    retries = 0
 
-    # 0 = open port
-    if result == 0:
-        print(f"Open port: {port}")
-        sock.close()
-    else:
-        print(f"Closed port: {port}")
+    while retries < max_retries:
+        try:
+            # Create a socket (socket.AF_INET to use IPv4.), (socket.SOCK_STREAM to use TCP protocol)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(timeout)
+            result = sock.connect_ex((ip, port))
+
+            # 0 = open port
+            if result == 0:
+                print(f"Open port: {port}")
+                sock.close()
+            else:
+                print(f"Closed port: {port}")
+            break # Break if the port is successfully scanned.
+        except sock.error:
+            retries += 1
+            if retries == max_retries:
+                print(f"Failed to scan the port: {port}")
+                break # Break after max entries.
 
 # This list will store references to all the created thread objects.
 threads = []
