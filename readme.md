@@ -1,0 +1,1 @@
+Excute the script and introduce an ip address (ex. # 45.33.32.156)
