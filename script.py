@@ -46,12 +46,11 @@ def get_port_range():
         except ValueError:
             print("Invalid input. Please enter valid numeric values for ports.")
 
-# User input with validation.
-ip = get_ip()
-start_port, end_port = get_port_range()
-
-timeout = 3
-max_retries = 3
+# Write the results in a .txt file.
+# "a" stands for Append mode: the data will be added to the end of the file rather than overwriting the existing content.
+def write_to_file(data):
+    with open("results.txt", "a") as f:
+        f.write(data + "\n")
 
 def scan_port(port):
     retries = 0
@@ -65,22 +64,36 @@ def scan_port(port):
 
             # 0 = open port
             if result == 0:
-                print(f"Open port: {port}")
+                write_to_file(f"Open port: {port}")
             else:
-                print(f"Closed port: {port}")
+                write_to_file(f"Closed port: {port}")
             sock.close()
             break # Break if the port is successfully scanned.
         except sock.error:
             retries += 1
             if retries == max_retries:
-                print(f"Failed to scan the port: {port}")
+                write_to_file(f"Failed to scan the port: {port}")
             sock.close()
             break # Break after max entries.
+
+# User input with validation.
+ip = get_ip()
+start_port, end_port = get_port_range()
+
+timeout = 3
+max_retries = 3
+
+# Clear the results file at the start.
+with open("results.txt", "w") as f:
+    f.write("Port Scan Results\n")
+    f.write(f"Scanning IP: {ip}\n")
+    f.write(f"Port range: {start_port}-{end_port}\n")
+    f.write("=" * 40 + "\n")
 
 # This list will store references to all the created thread objects.
 threads = []
 
-# Loop thorugh the 65535 exsisting ports.
+# Loop thorugh the specified port range.
 for port in range(start_port, end_port + 1):
     # For every port, a thread is created, excecuting the scan_port function in the port.
     thread = threading.Thread(target=scan_port, args=(port,))
@@ -94,3 +107,5 @@ for port in range(start_port, end_port + 1):
 # .join ensures the program to wait for each thread to finish its task before continuing.
 for thread in threads:
     thread.join()
+
+print("Scan complete. Results saved in results.txt")

@@ -8,8 +8,8 @@ A simple Python-based port scanner that allows you to scan a specified range of 
 - [X] **Multithreading**: Uses multiple threads to scan ports in parallel, making the scanning process faster.
 - [X] **Retries on Failures**: Each port scan is retried up to `max_retries` times if there is a connection failure (e.g., timeouts or unreachable ports).
 - [X] **Timeout Configuration**: Supports timeout configuration to limit the time for each port scan attempt.
+- [X] **Better Output**: Output the results in a .txt file.
 - [ ] **Thread Pooling** 
-- [ ] **Better Output** 
 - [ ] **Improved Error Handling** 
 - [ ] **Timeout Configuration** 
 - [ ] **Support for UDP** 
@@ -63,25 +63,33 @@ End port (default: 65535):
 
 4. Results:
 
-The script will output whether each port in the range is open or closed:
+The script will output the results in a results.txt file in the root directory of the project, showing whether each port in the range is open or closed:
 
-```sh
-Open port: 22
-Closed port: 80
-Open port: 443
+```
+Scan complete. Results saved in results.txt
 ```
 
 #### Example Output:
 
-```sh
-IP address to scan: 45.33.32.156
-Start port (default 1): 20
-End port (default: 65535): 25
-Open port: 21
-Closed port: 22
-Open port: 23
+```
+Port Scan Results
+Scanning IP: 45.33.32.156
+Port range: 1-25
+========================================
+Open port: 25
+Open port: 22
+Closed port: 10
+Closed port: 1
+Closed port: 7
+Closed port: 4
+Closed port: 2
+Closed port: 13
+Closed port: 3
+Closed port: 8
+Closed port: 11
 Closed port: 24
-Failed to scan port: 25
+Closed port: 20
+Closed port: 17
 ```
 
 ## Disclaimer:
