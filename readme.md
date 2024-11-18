@@ -9,11 +9,11 @@ A simple Python-based port scanner that allows you to scan a specified range of 
 - [X] **Retries on Failures**: Each port scan is retried up to `max_retries` times if there is a connection failure (e.g., timeouts or unreachable ports).
 - [X] **Timeout Configuration**: Supports timeout configuration to limit the time for each port scan attempt.
 - [X] **Better Output**: Output the results in a .txt file.
+- [X] **Progress Bar** 
 - [ ] **Thread Pooling** 
 - [ ] **Improved Error Handling** 
 - [ ] **Timeout Configuration** 
 - [ ] **Support for UDP** 
-- [ ] **Progress Bar** 
 
 ## Built With:
 
@@ -21,11 +21,11 @@ A simple Python-based port scanner that allows you to scan a specified range of 
 ![Socket](https://img.shields.io/badge/Socket-000000?style=for-the-badge&logo=python&logoColor=white)
 ![Threading](https://img.shields.io/badge/Threading-000000?style=for-the-badge&logo=python&logoColor=white)
 ![Regular Expressions](https://img.shields.io/badge/Regex-000000?style=for-the-badge&logo=python&logoColor=white)
-
+![tqdm](https://img.shields.io/badge/tqdm-000000?style=for-the-badge&logo=python&logoColor=white)
 
 ## Installation:
 
-Ensure you have Python 3.x installed on your system. You do not need any external libraries for this script to run, as it uses Python's built-in `socket`, `threading`, and `re` modules.
+Ensure you have Python 3.x installed on your system. You do not need any external libraries for this script to run, as it uses Python's built-in `socket`, `threading`, `tqdm` and `re` modules.
 
 1. Clone this repository or download the script file `port_scanner.py`.
 

@@ -1,6 +1,7 @@
 import socket
 import threading
 import re
+from tqdm import tqdm
 
 # Validate IP.
 def is_valid_ip(ip):
@@ -93,15 +94,20 @@ with open("results.txt", "w") as f:
 # This list will store references to all the created thread objects.
 threads = []
 
-# Loop thorugh the specified port range.
-for port in range(start_port, end_port + 1):
-    # For every port, a thread is created, excecuting the scan_port function in the port.
-    thread = threading.Thread(target=scan_port, args=(port,))
+# Show tqdm progress bar.
+with tqdm(total=end_port - start_port + 1, desc="Scanning ports", unit="port") as pbar:
+    # Loop thorugh the specified port range.
+    for port in range(start_port, end_port + 1):
+        # For every port, a thread is created, excecuting the scan_port function in the port.
+        thread = threading.Thread(target=scan_port, args=(port,))
 
-    # Add the newly created thread to the threads list.
-    threads.append(thread)
+        # Add the newly created thread to the threads list.
+        threads.append(thread)
 
-    thread.start()
+        thread.start()
+
+        # Update the progress bar each time a thread is started.
+        pbar.update(1)
 
 # Iterates over all the started threads. 
 # .join ensures the program to wait for each thread to finish its task before continuing.
