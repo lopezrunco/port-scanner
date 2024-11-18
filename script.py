@@ -2,6 +2,7 @@ import socket
 import threading
 import re
 from tqdm import tqdm
+import sys
 
 # Validate IP.
 def is_valid_ip(ip):
@@ -15,11 +16,15 @@ def is_valid_port(port):
 # Handle & validate IP address input.
 def get_ip():
     while True:
-        ip = input("IP address to scan: ").strip()
-        if is_valid_ip(ip):
-            return ip
-        else:
-            print("Invalid IP address.")
+        try:
+            ip = input("IP address to scan: ").strip()
+            if is_valid_ip(ip):
+                return ip
+            else:
+                print("Invalid IP address format. Please enter a valid IPv4 address.")
+        except Exception as error:
+            print(f"Error getting IP address: {error}")
+            sys.exit(1)
 
 # Handle  & validate port input.
 def get_port_range():
@@ -46,12 +51,19 @@ def get_port_range():
                 print("Invalid port range. Port range must be 1 to 65535.")
         except ValueError:
             print("Invalid input. Please enter valid numeric values for ports.")
+        except Exception as error:
+            print(f"Error getting port range: {error}")
+            sys.exit(1)
 
 # Write the results in a .txt file.
 # "a" stands for Append mode: the data will be added to the end of the file rather than overwriting the existing content.
 def write_to_file(data):
-    with open("results.txt", "a") as f:
-        f.write(data + "\n")
+    try:
+        with open("results.txt", "a") as f:
+            f.write(data + "\n")
+    except Exception as error:
+        print(f"Error writing to file: {error}")
+        sys.exit(1)
 
 def scan_port(port):
     retries = 0
@@ -70,11 +82,19 @@ def scan_port(port):
                 write_to_file(f"Closed port: {port}")
             sock.close()
             break # Break if the port is successfully scanned.
-        except sock.error:
+        except socket.timeout:
             retries += 1
+            print(f"Timeout while scanning port {port}. Retrying... ({retries}/{max_retries})")
+        except sock.error as error:
+            retries += 1
+            print(f"Socket error while scanning port {port}: {error}. Retrying... ({retries}/{max_retries})")
+        except Exception as error:
+            print(f"Unexpected error while scanning port {port}: {error}")
+            retries += 1
+        finally:
+            sock.close()
             if retries == max_retries:
                 write_to_file(f"Failed to scan the port: {port}")
-            sock.close()
             break # Break after max entries.
 
 # User input with validation.
@@ -85,11 +105,15 @@ timeout = 3
 max_retries = 3
 
 # Clear the results file at the start.
-with open("results.txt", "w") as f:
-    f.write("Port Scan Results\n")
-    f.write(f"Scanning IP: {ip}\n")
-    f.write(f"Port range: {start_port}-{end_port}\n")
-    f.write("=" * 40 + "\n")
+try:
+    with open("results.txt", "w") as f:
+        f.write("Port Scan Results\n")
+        f.write(f"Scanning IP: {ip}\n")
+        f.write(f"Port range: {start_port}-{end_port}\n")
+        f.write("=" * 40 + "\n")
+except Exception as error:
+    print(f"Error initializing results file: {error}")
+    sys.exit(1)
 
 # This list will store references to all the created thread objects.
 threads = []
@@ -98,20 +122,24 @@ threads = []
 with tqdm(total=end_port - start_port + 1, desc="Scanning ports", unit="port") as pbar:
     # Loop thorugh the specified port range.
     for port in range(start_port, end_port + 1):
-        # For every port, a thread is created, excecuting the scan_port function in the port.
-        thread = threading.Thread(target=scan_port, args=(port,))
-
-        # Add the newly created thread to the threads list.
-        threads.append(thread)
-
-        thread.start()
-
-        # Update the progress bar each time a thread is started.
-        pbar.update(1)
+        try:
+            # For every port, a thread is created, excecuting the scan_port function in the port.
+            thread = threading.Thread(target=scan_port, args=(port,))
+            # Add the newly created thread to the threads list.
+            threads.append(thread)
+            thread.start()
+            # Update the progress bar each time a thread is started.
+            pbar.update(1)
+        except Exception as error:
+            print(f"Error starting thread for port {port}: {error}")
+            continue
 
 # Iterates over all the started threads. 
 # .join ensures the program to wait for each thread to finish its task before continuing.
 for thread in threads:
-    thread.join()
+    try:
+        thread.join()
+    except Exception as error:
+        print(f"Error waiting for thread to finish: {error}")
 
 print("Scan complete. Results saved in results.txt")
