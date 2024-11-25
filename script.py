@@ -4,6 +4,7 @@ import re
 from tqdm import tqdm
 import sys
 from datetime import datetime
+import time
 
 # Validate IP.
 def is_valid_ip(ip):
@@ -80,6 +81,7 @@ def write_error_log(error_message):
 
 def scan_port(port):
     retries = 0
+    delay = 0.1
 
     while retries < max_retries:
         try:
@@ -95,6 +97,11 @@ def scan_port(port):
                 write_to_file(f"Closed port: {port}")
             sock.close()
             break # Break if the port is successfully scanned.
+        except (ConnectionRefusedError, PermissionError) as error:
+            # Catch security-related errors (like access denied error (restricted port)).
+            error_message = f"Access denied while scanning port {port}: {error}"
+            print(error_message)
+            write_error_log(error_message)
         except socket.timeout:
             retries += 1
             error_message = f"Timeout while scanning port {port}. Retrying... ({retries}/{max_retries})"
@@ -117,6 +124,9 @@ def scan_port(port):
                 write_to_file(error_message)
                 write_error_log(error_message)
             break # Break after max entries.
+    
+    # Add sleep between scans for rate limiting.
+    time.sleep(delay)
 
 # User input with validation.
 ip = get_ip()
