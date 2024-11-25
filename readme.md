@@ -23,10 +23,11 @@ A simple Python-based port scanner that allows you to scan a specified range of 
 ![Regular Expressions](https://img.shields.io/badge/Regex-000000?style=for-the-badge&logo=python&logoColor=white)
 ![tqdm](https://img.shields.io/badge/tqdm-000000?style=for-the-badge&logo=python&logoColor=white)
 ![SYS](https://img.shields.io/badge/SYS-000000?style=for-the-badge&logo=python&logoColor=white)
+![datetime](https://img.shields.io/badge/datetime-000000?style=for-the-badge&logo=python&logoColor=white)
 
 ## Installation:
 
-Ensure you have Python 3.x installed on your system. You do not need any external libraries for this script to run, as it uses Python's built-in `socket`, `threading`, `tqdm`, `sys` and `re` modules.
+Ensure you have Python 3.x installed on your system. You do not need any external libraries for this script to run, as it uses Python's built-in `socket`, `threading`, `tqdm`, `sys`, `datetime` and `re` modules.
 
 1. Clone this repository or download the script file `port_scanner.py`.
 
@@ -92,6 +93,8 @@ Closed port: 24
 Closed port: 20
 Closed port: 17
 ```
+
+If there are any errors in the process, an `error_log.txt` file will be generated in the root of the project.
 
 ## Disclaimer:
 

@@ -3,6 +3,7 @@ import threading
 import re
 from tqdm import tqdm
 import sys
+from datetime import datetime
 
 # Validate IP.
 def is_valid_ip(ip):
@@ -59,10 +60,22 @@ def get_port_range():
 # "a" stands for Append mode: the data will be added to the end of the file rather than overwriting the existing content.
 def write_to_file(data):
     try:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         with open("results.txt", "a") as f:
-            f.write(data + "\n")
+            f.write(f"[{timestamp}] {data}\n")
     except Exception as error:
         print(f"Error writing to file: {error}")
+        sys.exit(1)
+
+# Write deailed error log.
+def write_error_log(error_message):
+    try:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open("error_log.txt", "a") as f:
+            f.write(f"[{timestamp}] {error_message}\n")
+    except Exception as error:
+        print(f"Error writing to error log: {error}")
         sys.exit(1)
 
 def scan_port(port):
@@ -84,17 +97,25 @@ def scan_port(port):
             break # Break if the port is successfully scanned.
         except socket.timeout:
             retries += 1
-            print(f"Timeout while scanning port {port}. Retrying... ({retries}/{max_retries})")
+            error_message = f"Timeout while scanning port {port}. Retrying... ({retries}/{max_retries})"
+            print(error_message)
+            write_error_log(error_message)
         except sock.error as error:
             retries += 1
-            print(f"Socket error while scanning port {port}: {error}. Retrying... ({retries}/{max_retries})")
+            error_message = f"Socket error while scanning port {port}: {error}. Retrying... ({retries}/{max_retries})"
+            print(error_message)
+            write_error_log(error_message)
         except Exception as error:
-            print(f"Unexpected error while scanning port {port}: {error}")
             retries += 1
+            error_message = f"Unexpected error while scanning port {port}: {error}."
+            print(error_message)
+            write_error_log(error_message)
         finally:
             sock.close()
             if retries == max_retries:
-                write_to_file(f"Failed to scan the port: {port}")
+                error_message = f"Failed to scan the port: {port}"
+                write_to_file(error_message)
+                write_error_log(error_message)
             break # Break after max entries.
 
 # User input with validation.
@@ -131,7 +152,9 @@ with tqdm(total=end_port - start_port + 1, desc="Scanning ports", unit="port") a
             # Update the progress bar each time a thread is started.
             pbar.update(1)
         except Exception as error:
-            print(f"Error starting thread for port {port}: {error}")
+            error_message = f"Error starting thread for port {port}: {error}"
+            print(error_message)
+            write_error_log(error_message)
             continue
 
 # Iterates over all the started threads. 
@@ -140,6 +163,8 @@ for thread in threads:
     try:
         thread.join()
     except Exception as error:
-        print(f"Error waiting for thread to finish: {error}")
+        error_message = f"Error waiting for thread to finish: {error}"
+        print(error_message)
+        write_error_log(error_message)
 
 print("Scan complete. Results saved in results.txt")
