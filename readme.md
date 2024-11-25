@@ -24,10 +24,11 @@ A simple Python-based port scanner that allows you to scan a specified range of 
 ![tqdm](https://img.shields.io/badge/tqdm-000000?style=for-the-badge&logo=python&logoColor=white)
 ![SYS](https://img.shields.io/badge/SYS-000000?style=for-the-badge&logo=python&logoColor=white)
 ![datetime](https://img.shields.io/badge/datetime-000000?style=for-the-badge&logo=python&logoColor=white)
+![time](https://img.shields.io/badge/time-000000?style=for-the-badge&logo=python&logoColor=white)
 
 ## Installation:
 
-Ensure you have Python 3.x installed on your system. You do not need any external libraries for this script to run, as it uses Python's built-in `socket`, `threading`, `tqdm`, `sys`, `datetime` and `re` modules.
+Ensure you have Python 3.x installed on your system. You do not need any external libraries for this script to run, as it uses Python's built-in `socket`, `threading`, `tqdm`, `sys`, `datetime`, `time` and `re` modules.
 
 1. Clone this repository or download the script file `port_scanner.py`.
 
